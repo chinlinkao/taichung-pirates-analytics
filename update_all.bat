@@ -23,8 +23,12 @@ echo [2/3] 本機數據庫更新成功！準備推送至 GitHub...
 echo ==========================================================
 echo.
 
-git add data/pirates.db data/海盜隊網頁標題.csv src/app.py update_all.bat
-git commit -m update: 本機一鍵同步最新賽事數據
+git add .
+git diff-index --quiet HEAD
+if errorlevel 1 (
+    git commit -m update: 本機一鍵同步最新賽事數據
+)
+git pull --rebase origin main
 git push origin main
 
 if errorlevel 1 (

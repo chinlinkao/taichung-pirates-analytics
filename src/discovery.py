@@ -133,19 +133,24 @@ def discover_pirate_links(
             print(f"[!] 無法取得首頁內容: {e}")
             return []
 
-        # 取得所有比賽與聯賽連結
-        raw_game_links = re.findall(r'href=["\']([^"\']*game_id=\d+)["\']', index_html)
-        game_links = set()
-        for link in raw_game_links:
-            full = BASE_URL + link if link.startswith("/") else link
-            game_links.add(full)
+        # 取得所有比賽與聯賽連結，並智慧過濾與「海盜」或「台中就是棒/台灣大賽」相關的賽程頁面
+        all_index_links = extract_links_from_html(index_html, BASE_URL)
+        game_links: Dict[str, str] = {}
+        for link, text in all_index_links:
+            if "game_id=" in link and "show_text.php" not in link:
+                clean_link = link.split("#")[0]
+                # 排除其他無關縣市 (如臺北、新北、桃園、新竹、台南、高雄等其他聯盟)
+                is_irrelevant = any(reg in text for reg in ["臺北", "台北", "新北", "桃園", "新竹", "臺南", "台南", "高雄", "花蓮", "宜蘭", "苗栗", "彰化", "嘉義", "屏東"])
+                is_target = ("臺中" in text or "台中" in text or "台灣大賽" in text or "海盜" in text)
+                if is_target or not is_irrelevant:
+                    game_links[clean_link] = text
 
-        print(f"[*] 找到 {len(game_links)} 個賽程/聯賽頁面，開始逐一檢索「海盜」球隊...")
+        print(f"[*] 經智慧比對，鎖定 {len(game_links)} 個相關賽程/聯賽頁面，開始檢索「海盜」球隊...")
 
         candidate_links: Dict[str, str] = {}  # url -> link_text
 
         # 先檢查首頁本身
-        for url, text in extract_links_from_html(index_html, BASE_URL):
+        for url, text in all_index_links:
             if "show_text.php" in url:
                 continue
             if "海盜" in text and "team_id" in url:
@@ -153,8 +158,8 @@ def discover_pirate_links(
                 if clean not in existing_urls:
                     candidate_links[clean] = text
 
-        # 循序檢查各賽事頁
-        for i, g_url in enumerate(sorted(game_links), 1):
+        # 循序檢查篩選後的目標賽事頁
+        for i, (g_url, g_title) in enumerate(sorted(game_links.items()), 1):
             try:
                 g_html = fetch_page(client, g_url)
                 for url, text in extract_links_from_html(g_html, BASE_URL):
