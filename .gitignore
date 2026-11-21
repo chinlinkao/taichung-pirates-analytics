@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Streamlit secrets (密鑰與憑證嚴禁推上 GitHub)
+.streamlit/secrets.toml
+
+# Raw HTML Data Cache (快取檔案龐大，切勿推上 GitHub)
+data/raw_html/
+raw_html/
+
+# 但明確保留 SQLite 資料庫與種子 CSV (供 Streamlit Community Cloud 直接讀取)
+!data/pirates.db
+!data/海盜隊網頁標題.csv
+
+# OS & IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
