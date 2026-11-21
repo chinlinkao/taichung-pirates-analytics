@@ -130,8 +130,9 @@ def get_last_updated_time() -> str:
 last_update_str = get_last_updated_time()
 st.sidebar.info(f"🕒 **最後更新時間**\n\n{last_update_str}")
 
+# 若在本機環境且有完整爬蟲環境，提供即時重爬按鈕；雲端環境則引導使用一鍵腳本
 if CAN_SYNC:
-    if st.sidebar.button("🔄 同步最新戰績 (2026)", use_container_width=True, help="重新爬取 2026 年最新網頁快取、解析入庫並刷新看板"):
+    if st.sidebar.button("🔄 本機同步最新戰績 (2026)", use_container_width=True, help="重新爬取 2026 年最新網頁快取、解析入庫並刷新看板"):
         with st.spinner("正在安全連線下載最新賽事快取並重新入庫，請稍候..."):
             try:
                 success = run_pipeline(refresh_year=2026)
@@ -143,6 +144,8 @@ if CAN_SYNC:
                     st.sidebar.error("❌ 更新失敗，請檢查資料管線記錄。")
             except Exception as e:
                 st.sidebar.error(f"❌ 更新發生錯誤: {e}")
+else:
+    st.sidebar.caption("💡 雲端看板為唯讀展示，若需更新數據請在本機雙擊 `update_all.bat` 自動推送。")
 
 st.sidebar.markdown(
     """
