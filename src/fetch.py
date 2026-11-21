@@ -49,6 +49,7 @@ def fetch_and_cache(
     client: httpx.Client,
     cache_dir: Path = DEFAULT_CACHE_DIR,
     refresh_year: Optional[int] = None,
+    refresh_season: Optional[str] = None,
     force: bool = False,
     target_team_id: Optional[int] = None,
 ) -> tuple[Path, bool]:
@@ -64,7 +65,9 @@ def fetch_and_cache(
         if target_team_id is not None and seed["team_id"] == target_team_id:
             need_download = True
         elif refresh_year is not None and seed["year"] == refresh_year:
-            need_download = True
+            # 若有指定季節 (如 '秋季')，只刷新該季節；若無指定則刷新該年份所有頁面
+            if refresh_season is None or seed.get("season") == refresh_season:
+                need_download = True
         elif not cache_file.exists() or cache_file.stat().st_size == 0:
             need_download = True
 
@@ -88,6 +91,7 @@ def fetch_all(
     seeds: Optional[List[Dict[str, Any]]] = None,
     cache_dir: Path = DEFAULT_CACHE_DIR,
     refresh_year: Optional[int] = None,
+    refresh_season: Optional[str] = None,
     force: bool = False,
     target_team_id: Optional[int] = None,
 ) -> List[tuple[Dict[str, Any], Path]]:
@@ -108,6 +112,7 @@ def fetch_all(
                 client=client,
                 cache_dir=cache_dir,
                 refresh_year=refresh_year,
+                refresh_season=refresh_season,
                 force=force,
                 target_team_id=target_team_id,
             )

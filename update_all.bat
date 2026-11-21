@@ -3,11 +3,11 @@ chcp 65001 >nul
 cd /d %~dp0
 
 echo ==========================================================
-echo [1/3] 正在執行數據管線 (自動探索新賽事、下載最新戰績並校驗入庫)...
+echo [1/3] 正在執行數據管線 (刷新當前賽事戰績並校驗入庫)...
 echo ==========================================================
 echo.
 
-call .venv\Scripts\python.exe -u run_pipeline.py --discover --refresh-year 2026
+call .venv\Scripts\python.exe -u run_pipeline.py --refresh-year 2026 --refresh-season 秋季
 
 if errorlevel 1 (
     echo.

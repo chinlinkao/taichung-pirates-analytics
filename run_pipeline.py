@@ -26,6 +26,7 @@ from src.verify import VerificationRunner
 def run_pipeline(
     discover: bool = False,
     refresh_year: Optional[int] = None,
+    refresh_season: Optional[str] = None,
     parse_only: bool = False,
     force: bool = False,
     db_path: Path | str = DEFAULT_DB_PATH,
@@ -43,7 +44,7 @@ def run_pipeline(
     # 1. 禮貌下載快取階段
     if not parse_only:
         print("\n>>> [階段 1/3] 執行網頁快取檢查與下載 (fetch.py)...")
-        fetch_all(refresh_year=refresh_year, force=force)
+        fetch_all(refresh_year=refresh_year, refresh_season=refresh_season, force=force)
     else:
         print("\n>>> [階段 1/3] 已指定 --parse-only，跳過網路下載。")
 
@@ -68,6 +69,7 @@ def main():
     parser = argparse.ArgumentParser(description="台中小海盜棒球數據資料庫 一鍵建置管線")
     parser.add_argument("--discover", action="store_true", help="自動探索 myscore.games 全新賽事並增量更新種子 CSV")
     parser.add_argument("--refresh-year", type=int, help="強制刷新指定年份賽事快取 (如 2026)")
+    parser.add_argument("--refresh-season", type=str, help="強制刷新指定賽季賽事快取 (如 '秋季')")
     parser.add_argument("--parse-only", action="store_true", help="跳過網路下載，直接使用既有快取解析入庫")
     parser.add_argument("--force", action="store_true", help="強制重新下載所有頁面快取")
     parser.add_argument("--db", type=str, default=str(DEFAULT_DB_PATH), help="指定 SQLite 資料庫路徑")
@@ -76,6 +78,7 @@ def main():
     success = run_pipeline(
         discover=args.discover,
         refresh_year=args.refresh_year,
+        refresh_season=args.refresh_season,
         parse_only=args.parse_only,
         force=args.force,
         db_path=args.db,
