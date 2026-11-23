@@ -26,9 +26,23 @@ echo.
 git add .
 git diff-index --quiet HEAD
 if errorlevel 1 (
-    git commit -m update: 本機一鍵同步最新賽事數據
+    git commit -m "update: 本機一鍵同步最新賽事數據"
+    if errorlevel 1 (
+        echo.
+        echo [!] Git 提交失敗，取消推送。
+        echo.
+        pause
+        exit /b 1
+    )
 )
 git pull --rebase origin main
+if errorlevel 1 (
+    echo.
+    echo [!] Git 拉取合併失敗，請確認是否有衝突。
+    echo.
+    pause
+    exit /b 1
+)
 git push origin main
 
 if errorlevel 1 (
@@ -43,7 +57,7 @@ echo.
 echo ==========================================================
 echo [3/3] 全流程完成！
 echo 數據已成功推送到 GitHub，Streamlit Cloud 正在自動更新線上看板！
-echo 線上網址: https://taichung-pirates-analytics-8daxykwaebdotzf79m37ya.streamlit.app/
+echo [網址] https://taichung-pirates-analytics-8daxykwaebdotzf79m37ya.streamlit.app/
 echo ==========================================================
 echo.
 pause
